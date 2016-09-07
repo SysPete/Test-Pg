@@ -152,6 +152,24 @@ has nosync => (
     default => 1,
 );
 
+=head2 pg_ctl
+
+The path to the C<pg_ctl> executable. If not provided then L<File::Which> is
+used to try and find it.
+
+=cut
+
+has pg_ctl => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $pgctl = which 'pg_ctl';
+        # we only use pg_ctl if Pg version is >= 9
+        my $ret = qx/"$pgctl" --version/;
+        return $ret =~ /(\d+)\./ && $1 >= 9 ? $pgctl : undef;
+    },
+);
+
 =head2 pgdata
 
 The file system location of the database configuration files.
