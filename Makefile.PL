@@ -19,6 +19,8 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Carp'                   => 0,
+        'DBD::Pg'                => 0,
+        'DBI'                    => 0.
         'File::Which'            => 0,
         'Moo'                    => 0,
         'MooX::Types::MooseLike' => 0,
