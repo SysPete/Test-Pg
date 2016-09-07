@@ -1,6 +1,6 @@
 NAME
 
-    Test::Pg - The great new Test::Pg!
+    Test::Pg - PostgreSQL instances for running tests
 
 VERSION
 
@@ -15,8 +15,14 @@ SYNOPSIS
         my $pgsql = Test::Pg->new()
           or plan skip_all => $Test::Pg::errstr;
     
-    
         ...
+
+DESCRIPTION
+
+    This module is meant as an (almost) drop-in replacement for
+    Test::PostgreSQL without all of the ancient baggage. At the same time
+    it tries to be compatible with older versions of Perl than is possible
+    with the most recent release of Test::PostgreSQL.
 
 ATTRIBUTES
 
@@ -24,12 +30,18 @@ ATTRIBUTES
 
  auth
 
-    The initdb authentication method. Defaults to 'trust'.
+    The "initdb" authentication method. Defaults to 'trust'.
+
+ auto_start
+
+    If this attribute is set to a false value then the "BUILD" method will
+    not call either "initdb" or "start" so you will have to run those
+    yourself.
 
  base_dir
 
-    The directory where the database cluster will be stored. Defaults to a
-    temporary directory. See also "tempdir_options".
+    The directory under which the database cluster will be stored. Defaults
+    to a temporary directory (see "tempdir_options").
 
     Any directory provided as argument will be coerced into a Path::Tiny
     object.
@@ -39,9 +51,27 @@ ATTRIBUTES
     We attempt to use this port first, and will increment from there. The
     final port ends up in the "port" attribute.
 
+ dbname
+
+    The name of the database.
+
+    Defaults to 'test'.
+
+ dsn
+
+    The database dsn; the first argument to DBI->connect.
+
+    This is constructed from other attributes if it is not provided.
+
  encoding
 
     Defaults to 'UTF8'.
+
+ host
+
+    The host name or IP address of the database server.
+
+    Defaults to '127.0.0.1'.
 
  initdb
 
@@ -59,11 +89,20 @@ ATTRIBUTES
 
     If you wish to disable this behaviour set this attribute to 0 (zero).
 
+ pg_ctl
+
+    The path to the pg_ctl executable. If not provided then File::Which is
+    used to try and find it.
+
  pgdata
 
     The file system location of the database configuration files.
 
     Defaults to subdir data of "base_dir".
+
+ port
+
+    The port the PostgreSQL server is listening on.
 
  postmaster
 
@@ -83,6 +122,11 @@ ATTRIBUTES
 
     Defaults to 'postgres'.
 
+ server_version_num
+
+    Used to stash the server_version_num of the PostgreSQL server we're
+    using.
+
 METHODS
 
  BUILD
@@ -93,15 +137,17 @@ METHODS
 
     Do our best to cleanup running PostgreSQL processes.
 
- remove_connections
-
-    Try to cleanly remove database connections.
-
  initdb
 
  start
 
  stop
+
+FUNCTIONS
+
+ remove_connections
+
+    Try to cleanly remove database connections.
 
 AUTHOR
 
