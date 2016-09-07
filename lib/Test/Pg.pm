@@ -37,8 +37,14 @@ our $VERSION = '0.01';
     my $pgsql = Test::Pg->new()
       or plan skip_all => $Test::Pg::errstr;
 
-
     ...
+
+=head1 DESCRIPTION
+
+This module is meant as an (almost) drop-in replacement for
+L<Test::PostgreSQL> without all of the ancient baggage. At the same time
+it tries to be compatible with older versions of Perl than is possible
+with the most recent release of L<Test::PostgreSQL>.
 
 =head1 ATTRIBUTES
 
@@ -46,7 +52,7 @@ The following attributes can be passed to the constructor.
 
 =head2 auth
 
-The C<initdb> authentication method.  Defaults to 'trust'.
+The L</initdb> authentication method.  Defaults to 'trust'.
 
 =cut
 
@@ -58,8 +64,8 @@ has auth => (
 
 =head2 base_dir
 
-The directory where the database cluster will be stored. Defaults to a
-temporary directory. See also L</tempdir_options>.
+The directory under which the database cluster will be stored. Defaults to a
+temporary directory (see L</tempdir_options>).
 
 Any directory provided as argument will be coerced into a C<Path::Tiny> object.
 
