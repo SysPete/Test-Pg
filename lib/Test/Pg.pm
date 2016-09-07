@@ -62,6 +62,19 @@ has auth => (
     default => 'trust',
 );
 
+=head2 auto_start
+
+If this attribute is set to a false value then the L</BUILD> method will not
+call either L</initdb> or L</start> so you will have to run those yourself.
+
+=cut
+
+has auto_start => (
+    is      => 'ro',
+    isa     => Bool,
+    default => 1,
+);
+
 =head2 base_dir
 
 The directory under which the database cluster will be stored. Defaults to a
@@ -301,9 +314,10 @@ Called automatically after object construction ... MORE ...
 
 sub BUILD {
     my $self = shift;
-    $self->initdb;
-    $self->create;
-    $self->start;
+    $self->auto_start && do {
+        $self->initdb;
+        $self->start;
+    };
 }
 
 =head2 DEMOLISH
