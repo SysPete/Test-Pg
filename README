@@ -1,0 +1,179 @@
+NAME
+
+    Test::Pg - The great new Test::Pg!
+
+VERSION
+
+    Version 0.01
+
+SYNOPSIS
+
+        use DBI;
+        use Test::Pg;
+        use Test::More;
+    
+        my $pgsql = Test::Pg->new()
+          or plan skip_all => $Test::Pg::errstr;
+    
+    
+        ...
+
+ATTRIBUTES
+
+    The following attributes can be passed to the constructor.
+
+ auth
+
+    The initdb authentication method. Defaults to 'trust'.
+
+ base_dir
+
+    The directory where the database cluster will be stored. Defaults to a
+    temporary directory. See also "tempdir_options".
+
+    Any directory provided as argument will be coerced into a Path::Tiny
+    object.
+
+ base_port
+
+    We attempt to use this port first, and will increment from there. The
+    final port ends up in the "port" attribute.
+
+ encoding
+
+    Defaults to 'UTF8'.
+
+ initdb
+
+    The path to the initdb executable. If not provided then File::Which is
+    used to try and find it.
+
+ locale
+
+    Defaults to 'C'.
+
+ nosync
+
+    By default we pass --nosync option to initdb and -F to "postmaster"
+    executable.
+
+    If you wish to disable this behaviour set this attribute to 0 (zero).
+
+ pgdata
+
+    The file system location of the database configuration files.
+
+    Defaults to subdir data of "base_dir".
+
+ postmaster
+
+    The path to the postmaster or postgres executable. If not provided then
+    File::Which is used to try and find one of them.
+
+ tempdir_options
+
+    A hash reference of options to be passed to "tempdir" in Path::Tiny
+    when the default value of "pgdata" is used (a temporary directory).
+
+    If no options are provided but $ENV{TEST_PG_PRESERVE} is set then
+    CLEANUP => 0 will be used to prevent the "pgdata" directory from being
+    cleaned up on exit.
+
+ username
+
+    Defaults to 'postgres'.
+
+METHODS
+
+ BUILD
+
+    Called automatically after object construction ... MORE ...
+
+ DEMOLISH
+
+    Do our best to cleanup running PostgreSQL processes.
+
+ remove_connections
+
+    Try to cleanly remove database connections.
+
+ initdb
+
+ start
+
+ stop
+
+AUTHOR
+
+    Peter Mottram (SysPete), <peter at sysnix.com>
+
+BUGS
+
+    Please report any bugs or feature requests via the GitHub issue tracker
+    at https://github.com/SysPete/Test-Pg/issues. I will be notified, and
+    then you'll automatically be notified of progress on your bug as I make
+    changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Test::Pg
+
+    You can also look for information at:
+
+      * GitHub issue tracker (report bugs here)
+
+      https://github.com/SysPete/Test-Pg/issues
+
+      * meta::cpan
+
+      https://metacpan.org/pod/Test::Pg
+
+SEE ALSO
+
+    Test::PostgreSQL, Test::Mojo::Pg
+
+ACKNOWLEDGEMENTS
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2016 Peter Mottram (SysPete).
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a
+    copy of the full license at:
+
+    http://www.perlfoundation.org/artistic_license_2_0
+
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
+
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
+
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
+
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by
+    the Package. If you institute patent litigation (including a
+    cross-claim or counterclaim) against any party alleging that the
+    Package constitutes direct or contributory patent infringement, then
+    this Artistic License to you shall terminate on the date that such
+    litigation is filed.
+
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
