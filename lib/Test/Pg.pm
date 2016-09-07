@@ -18,7 +18,7 @@ our $handles;
 
 =head1 NAME
 
-Test::Pg - The great new Test::Pg!
+Test::Pg - PostgreSQL instances for running tests
 
 =head1 VERSION
 
