@@ -304,6 +304,19 @@ has username => (
     default => 'postgres',
 );
 
+=head2 server_version_num
+
+Used to stash the server_version_num of the PostgreSQL server we're using.
+
+=cut
+
+has server_version_num => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+    },
+);
+
 =head1 METHODS
 
 =head2 BUILD
@@ -445,7 +458,15 @@ sub start {
 
 sub stop {
     my $self = shift;
+    if ( $self->pg_ctl ) {
+    }
+    else {
+    }
+
     print "Stopping...\n";
+
+    # cleanup stash so it is gone before we hit global destruction
+    delete $handles->{$self->pid};
 }
 
 =head1 FUNCTIONS
