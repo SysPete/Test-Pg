@@ -98,6 +98,39 @@ has base_port => (
     default => 15432,
 );
 
+=head2 dbname
+
+The name of the database.
+
+Defaults to 'test'.
+
+=cut
+
+has dbname => (
+    is      => 'ro',
+    isa     => Str,
+    default => 'test',
+);
+
+=head2 dsn
+
+The database dsn; the first argument to C<< DBI->connect >>.
+
+This is constructed from other attributes if it is not provided.
+
+=cut
+
+has dsn => (
+    is      => 'ro',
+    isa     => Str,
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return 'DBI:Pg:'
+          . join( ';', map { "$_=" . $self->$_ } qw/dbname host port/ );
+    },
+);
+
 =head2 encoding
 
 Defaults to 'UTF8'.
@@ -108,6 +141,20 @@ has encoding => (
     is      => 'ro',
     isa     => Str,
     default => 'UTF8',
+);
+
+=head2 host
+
+The host name or IP address of the database server.
+
+Defaults to '127.0.0.1'.
+
+=cut
+
+has host => (
+    is      => 'ro',
+    isa     => Str,
+    default => '127.0.0.1',
 );
 
 =head2 initdb
@@ -184,6 +231,17 @@ has pg_data => (
     default => sub {
         $_[0]->base_dir->child('data');
     },
+);
+
+=head2 port
+
+The port the PostgreSQL server is listening on.
+
+=cut
+
+has port => (
+    is  => 'rw',
+    isa => Int,
 );
 
 =head2 postmaster
@@ -277,33 +335,9 @@ sub DEMOLISH {
         }
     }
     else {
-        # object destruction so try a normal stop
+        # object destruction so just use 'stop' method
         $self->stop;
     }
-}
-
-=head2 remove_connections
-
-Try to cleanly remove database connections.
-
-=cut
-
-# cargo-culted from Test::Mojo::Pg
-sub remove_connections {
-    my $dsn = shift;
-    my ( $self, $p ) = @_;
-    say 'Removing existing connections' if $self->verbose;
-    my $pf = $self->get_version($p) < 90200 ? 'procpid' : 'pid';
-    my $q =
-        q|SELECT pg_terminate_backend(pg_stat_activity.|
-      . $pf . q|) |
-      . q|FROM   pg_stat_activity |
-      . q|WHERE  pg_stat_activity.datname='|
-      . $self->db . q|' |
-      . q|AND    |
-      . $pf
-      . q| <> pg_backend_pid();|;
-    $p->db->query($q);
 }
 
 =head2 initdb
@@ -398,6 +432,32 @@ sub start {
 sub stop {
     my $self = shift;
     print "Stopping...\n";
+}
+
+=head1 FUNCTIONS
+
+=head2 remove_connections
+
+Try to cleanly remove database connections.
+
+=cut
+
+# cargo-culted from Test::Mojo::Pg
+sub remove_connections {
+    my $dsn = shift;
+    my ( $self, $p ) = @_;
+    say 'Removing existing connections' if $self->verbose;
+    my $pf = $self->get_version($p) < 90200 ? 'procpid' : 'pid';
+    my $q =
+        q|SELECT pg_terminate_backend(pg_stat_activity.|
+      . $pf . q|) |
+      . q|FROM   pg_stat_activity |
+      . q|WHERE  pg_stat_activity.datname='|
+      . $self->db . q|' |
+      . q|AND    |
+      . $pf
+      . q| <> pg_backend_pid();|;
+    $p->db->query($q);
 }
 
 =head1 AUTHOR
