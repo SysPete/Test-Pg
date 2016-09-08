@@ -10,6 +10,7 @@ use MooX::Types::MooseLike::Base qw(:all);
 use Path::Tiny;
 use POSIX qw(SIGTERM SIGINT SIGQUIT SIGKILL WNOHANG);
 use Proc::Fork;
+use try::Tiny;
 use Moo;
 use namespace::clean;
 
@@ -223,6 +224,7 @@ has pg_ctl => (
     is      => 'ro',
     lazy    => 1,
     default => sub {
+        return if $ENV{TEST_PG_NO_PG_CTL};  # for testing
         my $pgctl = which 'pg_ctl';
         # we only use pg_ctl if Pg version is >= 9
         my $ret = qx/"$pgctl" --version/;
@@ -391,8 +393,7 @@ sub initdb {
             'initdb',
             '-s',    # silent mode: print only errors
             '-D', $self->pgdata,
-            '-o',    # initdb-options
-            join( ' ', @options ),
+            '-o', join( ' ', @options ),
         );
         system(@cmd) == 0 or croak "@cmd failed:$?";
     }
@@ -416,6 +417,38 @@ sub initdb {
 sub start {
     my $self = shift;
 
+    if ( $self->port ) {
+        # user supplied port
+        $self->try_start($self->port);
+    }
+    else {
+        my $tries = 10;
+        foreach my $port ( $self->base_port .. $self->base_port + $tries ) {
+            my $started = try {
+                $self->try_start($port);
+                1;
+            };
+            if ($started) {
+                $self->port($port);
+                return;
+            }
+        }
+        croak "Failed to start PostgreSQL: $@";
+    }
+}
+
+sub try_start {
+    my $port = shift;
+
+    my @options = (
+        '-A', $self->auth,
+        '-E', $self->encoding,
+        '--locale', $self->locale,
+        '-p', $self->port,
+        '-h', '127.0.0.1',
+    );
+    push @options, '-F' if $self->nosync;
+
     if ( $self->pg_ctl ) {
         my @cmd = (
             $self->pgctl,
@@ -424,15 +457,7 @@ sub start {
             '-s',   # silent mode: print only errors
             '-D', $self->pg_data,
             '-l', $self->base_dir->child('postgres.log'),
-            '-o',
-            join( ' ',
-                '-A', $self->auth,
-                '-E', $self->encoding,
-                '--locale=' . $self->locale,
-                '-p', $self->port,
-                '-h', '127.0.0.1',
-                $self->nosync ? '-F' : '',
-            )
+            '-o', join( ' ', @options ),
         );
     }
     else {

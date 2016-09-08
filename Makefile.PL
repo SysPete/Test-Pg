@@ -29,6 +29,7 @@ WriteMakefile(
         'POSIX'                  => 0,
         'Proc:Fork'              => 0,
         'strict'                 => 0,
+        'Try::Tiny'              => 0,
         'warnings'               => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
